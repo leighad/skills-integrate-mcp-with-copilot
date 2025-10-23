@@ -77,6 +77,9 @@ activities = {
     }
 }
 
+# In-memory session store (placeholder for future auth implementation)
+active_sessions = set()
+
 
 @app.get("/")
 def root():
@@ -130,3 +133,42 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+# --- Authentication placeholders ---
+@app.post("/auth/login")
+def login(email: str):
+    """Log a user in (placeholder).
+
+    This is a temporary, in-memory implementation for demonstration purposes.
+    """
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    if email in active_sessions:
+        raise HTTPException(status_code=400, detail="Already logged in")
+
+    active_sessions.add(email)
+    return {"message": f"Logged in {email}"}
+
+
+@app.post("/auth/logout")
+def logout(email: str):
+    """Log a user out (placeholder)."""
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    if email not in active_sessions:
+        raise HTTPException(status_code=400, detail="Not logged in")
+
+    active_sessions.remove(email)
+    return {"message": f"Logged out {email}"}
+
+
+@app.get("/auth/status")
+def auth_status(email: str):
+    """Return simple login status for the provided email (placeholder)."""
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    return {"email": email, "logged_in": email in active_sessions}
